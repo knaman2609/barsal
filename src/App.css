@@ -1,5 +1,4 @@
 body {
-  background-color: #181818;
   color: #f0f0f0;
   font-family: "Courier New", Courier, monospace;
   display: flex;
@@ -28,22 +27,46 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  justify-content: space-between;
+  height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #232526 0%, #414345 100%);
-  padding-top: 40px;
+  background-color: black;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  gap: 0; /* Remove gap since we're using space-between */
 }
+
+.top-content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  gap: 100px;
+  flex-shrink: 0;
+}
+
+.bottom-reserved-space {
+  width: 100%;
+  max-width: 700px;
+  min-height: 200px; /* Reserve space for follow-up questions */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
 .dashboard-content {
-  margin-top: 40px;
+  margin-top: 0;
   background: #232526;
-  border-radius: 16px;
+  border-radius: 0;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
   padding: 32px 40px 40px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 1100px;
+  width: 100%;
   max-width: 1200px;
+  box-sizing: border-box;
 }
 
 .dashboard-title {
@@ -53,14 +76,6 @@ body {
   letter-spacing: 1px;
   color: #fff;
   text-align: center;
-}
-
-.right-panel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
 }
 
 .question {
@@ -82,15 +97,18 @@ body {
 
 .chart-container {
   padding: 32px;
-  border-radius: 12px;
-  background-color: #282828;
+  border-radius: 0;
+  /* background-color: #282828; */
   min-height: 400px;
-  width: 700px;
+  width: 100%;
+  max-width: 700px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .chart-container > canvas {
@@ -106,9 +124,56 @@ h2 {
   margin-top: 0;
   padding: 24px 32px;
   background-color: #232526;
-  border-radius: 12px;
-  width: 700px;
+  border-radius: 0;
+  width: 100%;
+  max-width: 700px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  position: relative;
+  flex-shrink: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  min-height: 100px; /* Reserve minimum space */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  margin-bottom: 0; /* Remove bottom margin since it's in reserved space */
+}
+
+.follow-up-container.hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.follow-up-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.follow-up-placeholder {
+  height: 100px; /* Match min-height of container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  user-select: none;
+}
+
+.follow-up-container::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(240, 240, 240, 0.3),
+    transparent
+  );
+  border-radius: 1px;
 }
 
 .follow-up-container h3 {
@@ -121,7 +186,7 @@ h2 {
 .follow-up-container .question {
   background-color: #313131;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   margin-bottom: 10px;
   padding: 14px 18px;
   color: #f0f0f0;
@@ -155,25 +220,46 @@ h2 {
 }
 
 .dropdown-container {
-  /* width: 100%;/ */
-  width: 764px;
+  width: 100%;
+  max-width: 764px;
   padding: 0;
-  margin-bottom: 24px;
+  margin-bottom: 0; /* Remove bottom margin since we're using gap */
   background: none;
   display: flex;
   justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Add subtle visual separator after dropdown */
+.dropdown-container::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(240, 240, 240, 0.3),
+    transparent
+  );
+  border-radius: 1px;
 }
 
 .question-dropdown {
-  width: 764px;
+  width: 100%;
   padding: 14px 18px;
   font-size: 18px;
   background-color: #313131;
   color: #f0f0f0;
   border: 1.5px solid #444;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .question-dropdown:focus {
@@ -181,28 +267,15 @@ h2 {
   border-color: #007bff;
 }
 
-@media (max-width: 1200px) {
-  .dashboard-content,
-  .chart-container,
-  .follow-up-container {
-    min-width: 95vw;
-    width: 95vw;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  .question-dropdown {
-    width: 95vw;
-  }
-}
-
 /* Container for the custom select */
 .custom-select {
   position: relative;
-  width: 764px;
+  width: 100%;
+  max-width: 764px;
   margin-bottom: 24px;
 }
 
-/* The “closed” toggle button */
+/* The "closed" toggle button */
 .custom-select__toggle {
   width: 100%;
   padding: 14px 18px;
@@ -210,14 +283,18 @@ h2 {
   background-color: #313131;
   color: #f0f0f0;
   border: 1.5px solid #444;
-  border-radius: 8px;
+  border-radius: 0;
   text-align: left;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: border-color 0.2s;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
+
 .custom-select__toggle:focus,
 .custom-select__toggle:hover {
   border-color: #007bff;
@@ -234,7 +311,7 @@ h2 {
   overflow-y: auto;
   background: #313131;
   border: 1.5px solid #444;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
@@ -246,7 +323,10 @@ h2 {
   color: #f0f0f0;
   font-size: 1em;
   transition: background 0.2s;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
+
 .custom-select__item:hover {
   background: #444;
 }
@@ -255,4 +335,288 @@ h2 {
 .custom-select__item--active {
   background: linear-gradient(90deg, #007bff 0%, #005fa3 100%);
   font-weight: bold;
+}
+
+/* Mobile Responsive Breakpoints */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 20px 10px;
+    height: 100vh;
+  }
+
+  .top-content-container {
+    gap: 16px;
+  }
+
+  .bottom-reserved-space {
+    min-height: 150px; /* Smaller reserved space for mobile */
+  }
+
+  .dashboard-content {
+    margin-top: 0;
+    padding: 20px;
+    min-width: auto;
+  }
+
+  .chart-container {
+    padding: 20px;
+    min-height: 300px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .follow-up-container {
+    padding: 20px;
+    margin-top: 0;
+    max-height: 250px;
+    flex-shrink: 0;
+    min-height: 80px; /* Smaller min-height for mobile */
+  }
+
+  .follow-up-placeholder {
+    height: 80px; /* Match mobile min-height */
+  }
+
+  .follow-up-container h3 {
+    font-size: 1.1em;
+    margin-bottom: 16px;
+  }
+
+  .follow-up-container .question {
+    padding: 12px 16px;
+    font-size: 0.95em;
+  }
+
+  .custom-select__toggle {
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  .custom-select__item {
+    padding: 10px 16px;
+    font-size: 0.95em;
+  }
+
+  .question-dropdown {
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  .dashboard-title {
+    font-size: 1.5em;
+    margin-bottom: 24px;
+  }
+
+  /* Adjust visual separators for mobile */
+  .dropdown-container::after {
+    bottom: -15px;
+    width: 40px;
+  }
+
+  .follow-up-container::before {
+    top: -15px;
+    width: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 15px 8px;
+    height: 100vh;
+  }
+
+  .top-content-container {
+    gap: 12px;
+  }
+
+  .bottom-reserved-space {
+    min-height: 120px; /* Even smaller reserved space for very small screens */
+  }
+
+  .dashboard-content {
+    margin-top: 0;
+    padding: 16px;
+  }
+
+  .chart-container {
+    padding: 16px;
+    min-height: 250px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .follow-up-container {
+    padding: 16px;
+    margin-top: 0;
+    max-height: 200px;
+    flex-shrink: 0;
+    min-height: 60px; /* Even smaller min-height for very small screens */
+  }
+
+  .follow-up-placeholder {
+    height: 60px; /* Match very small screen min-height */
+  }
+
+  .follow-up-container h3 {
+    font-size: 1em;
+    margin-bottom: 12px;
+  }
+
+  .follow-up-container .question {
+    padding: 10px 14px;
+    font-size: 0.9em;
+  }
+
+  .custom-select__toggle {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .custom-select__item {
+    padding: 8px 14px;
+    font-size: 0.9em;
+  }
+
+  .question-dropdown {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .dashboard-title {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+  }
+
+  .dropdown-container {
+    margin-bottom: 0;
+  }
+
+  /* Adjust visual separators for very small screens */
+  .dropdown-container::after {
+    bottom: -12px;
+    width: 30px;
+  }
+
+  .follow-up-container::before {
+    top: -12px;
+    width: 30px;
+  }
+}
+
+/* Ensure charts are responsive */
+.chart-container canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Table responsiveness */
+table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  table {
+    font-size: 0.9em;
+  }
+
+  th,
+  td {
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 0.8em;
+  }
+
+  th,
+  td {
+    padding: 6px 4px;
+  }
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 768px) {
+  /* Ensure form inputs are properly sized on mobile */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+
+  /* Better touch targets */
+  button,
+  .question,
+  .custom-select__toggle,
+  .custom-select__item {
+    min-height: 44px;
+  }
+
+  /* Improve chart readability on mobile */
+  .chart-container {
+    overflow-x: auto;
+  }
+
+  /* Better spacing for mobile */
+  .dashboard-container > * {
+    margin-bottom: 16px;
+  }
+
+  .dashboard-container > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even smaller touch targets for very small screens */
+  button,
+  .question,
+  .custom-select__toggle,
+  .custom-select__item {
+    min-height: 40px;
+  }
+
+  /* Reduce font sizes further for very small screens */
+  .custom-select__toggle,
+  .custom-select__item,
+  .question-dropdown {
+    font-size: 14px;
+  }
+
+  /* Ensure proper spacing */
+  .chart-container,
+  .follow-up-container {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+}
+
+/* Ensure proper chart rendering on all devices */
+.react-chartjs-2 {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Fix for potential chart overflow issues */
+.chart-container > div {
+  width: 100% !important;
+  overflow: hidden;
+}
+
+/* Better form styling for mobile */
+@media (max-width: 768px) {
+  form {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  form input,
+  form select,
+  form textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }

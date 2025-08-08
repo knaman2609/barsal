@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import { Bar, Pie, Line } from "react-chartjs-2";
-import { speakSequentially } from "./services/elevenLabsService.js";
+import { speakSequentially, VOICE_IDS } from "./services/elevenLabsService.js";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,6 +26,10 @@ ChartJS.register(
   PointElement,
   LineElement
 );
+
+// Voice configuration for questions and answers
+const QUESTION_VOICE = VOICE_IDS.ADAM; // Male voice for questions
+const ANSWER_VOICE = VOICE_IDS.BELLA; // Female voice for answers
 
 function CustomSelect({ options, value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -80,6 +84,7 @@ function CustomSelect({ options, value, onChange }) {
 // Mock data for the charts
 const chartOptions = {
   responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: {
       display: false,
@@ -115,6 +120,8 @@ const chartOptions = {
     x: {
       ticks: {
         color: "#f0f0f0",
+        maxRotation: 45,
+        minRotation: 0,
       },
       grid: {
         color: "rgba(240, 240, 240, 0.1)",
@@ -739,40 +746,52 @@ const ValueDisplay = ({ value, label }) => (
 );
 
 const TableDisplay = ({ data, columns }) => (
-  <table
-    style={{ width: "100%", color: "#f0f0f0", borderCollapse: "collapse" }}
-  >
-    <thead>
-      <tr>
-        {columns.map((col) => (
-          <th
-            key={col.key}
-            style={{
-              borderBottom: "1px solid #555",
-              padding: "10px",
-              textAlign: "left",
-            }}
-          >
-            {col.title}
-          </th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {data.map((row, index) => (
-        <tr key={index}>
+  <div style={{ overflowX: "auto", width: "100%" }}>
+    <table
+      style={{ 
+        width: "100%", 
+        color: "#f0f0f0", 
+        borderCollapse: "collapse",
+        minWidth: "300px"
+      }}
+    >
+      <thead>
+        <tr>
           {columns.map((col) => (
-            <td
+            <th
               key={col.key}
-              style={{ borderBottom: "1px solid #555", padding: "10px" }}
+              style={{
+                borderBottom: "1px solid #555",
+                padding: "10px",
+                textAlign: "left",
+                whiteSpace: "nowrap"
+              }}
             >
-              {row[col.key]}
-            </td>
+              {col.title}
+            </th>
           ))}
         </tr>
-      ))}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {data.map((row, index) => (
+          <tr key={index}>
+            {columns.map((col) => (
+              <td
+                key={col.key}
+                style={{ 
+                  borderBottom: "1px solid #555", 
+                  padding: "10px",
+                  wordBreak: "break-word"
+                }}
+              >
+                {row[col.key]}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 );
 
 const Placeholder = ({ text }) => (
@@ -798,7 +817,9 @@ const FormDisplay = ({ fields, buttonText, onSubmit }) => {
         color: "#f0f0f0",
         display: "flex",
         flexDirection: "column",
-        gap: "10px",
+        gap: "12px",
+        width: "100%",
+        maxWidth: "400px",
       }}
     >
       {fields.map((field) => (
@@ -806,18 +827,30 @@ const FormDisplay = ({ fields, buttonText, onSubmit }) => {
           key={field.name}
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <label htmlFor={field.name}>{field.label}</label>
+          <label 
+            htmlFor={field.name}
+            style={{
+              marginBottom: "4px",
+              fontSize: "14px",
+              fontWeight: "500"
+            }}
+          >
+            {field.label}
+          </label>
           <input
             type={field.type}
             name={field.name}
             id={field.name}
             onChange={handleChange}
             style={{
-              padding: "8px",
-              borderRadius: "4px",
+              padding: "10px 12px",
+              borderRadius: "6px",
               border: "1px solid #555",
               backgroundColor: "#2a2a2a",
               color: "#f0f0f0",
+              fontSize: "14px",
+              width: "100%",
+              boxSizing: "border-box",
             }}
           />
         </div>
@@ -825,12 +858,15 @@ const FormDisplay = ({ fields, buttonText, onSubmit }) => {
       <button
         type="submit"
         style={{
-          padding: "10px",
-          borderRadius: "4px",
+          padding: "12px 16px",
+          borderRadius: "6px",
           border: "none",
           backgroundColor: "#007bff",
           color: "#fff",
           cursor: "pointer",
+          fontSize: "14px",
+          fontWeight: "500",
+          marginTop: "8px",
         }}
       >
         {buttonText}
@@ -995,6 +1031,8 @@ const HighRiskPincodesChart = () => (
 function App() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeFollowUp, setActiveFollowUp] = useState(null);
+  const [showContent, setShowContent] = useState(false);
+  const [showFollowUps, setShowFollowUps] = useState(false);
   const conversionRate =
     (conversionFunnelData.datasets[0].data[3] /
       conversionFunnelData.datasets[0].data[0]) *
@@ -2797,6 +2835,10 @@ function App() {
 
   useEffect(() => {
     if (tabs[activeTab].voice) {
+      // Reset content and follow-ups visibility when question changes
+      setShowContent(false);
+      setShowFollowUps(false);
+      
       let questionText, answerText;
       
       if (activeFollowUp !== null) {
@@ -2812,61 +2854,101 @@ function App() {
       }
       
       // Speak question first, then answer using ElevenLabs
-      speakSequentially(questionText, answerText);
+      // Show content when answer starts, show follow-ups when answer completes
+      speakSequentially(
+        questionText, 
+        answerText, 
+        QUESTION_VOICE, 
+        ANSWER_VOICE,
+        () => {
+          console.log('🎬 Showing visual content as answer begins');
+          setShowContent(true);
+        },
+        () => {
+          console.log('🎯 Answer audio completed - waiting 2s before showing follow-ups');
+          setTimeout(() => {
+            console.log('📋 Showing follow-up questions after delay');
+            setShowFollowUps(true);
+          }, 2000);
+        }
+      );
     }
   }, [activeTab, activeFollowUp]);
 
 
   return (
     <div className="dashboard-container debug bg-gray-900">
-      <div className="dropdown-container">
-        <CustomSelect
-          options={tabs}
-          value={activeTab}
-          onChange={(index) => {
-            setActiveTab(index);
-            setActiveFollowUp(null);
-          }}
-        />
-      </div>
-      <div className="right-panel">
-        <div className="chart-container">
-          {activeFollowUp !== null && tabs[activeTab].followUp
-            ? tabs[activeTab].followUp[activeFollowUp].answer
-            : tabs[activeTab].chart}
+      {/* Top Section - Dropdown and Answer Container */}
+      <div className="top-content-container">
+        <div className="dropdown-container">
+          <CustomSelect
+            options={tabs}
+            value={activeTab}
+            onChange={(index) => {
+              setActiveTab(index);
+              setActiveFollowUp(null);
+            }}
+          />
         </div>
-        {tabs[activeTab].followUp && (
-          <div className="follow-up-container">
-            <h3>Follow-up Questions:</h3>
-            {tabs[activeTab].followUp.map((q, index) => (
-              <div
-                key={index}
-                className={`question ${
-                  activeFollowUp === index &&
-                  activeTab ===
-                    tabs.findIndex(
-                      (t) => t.followUp === tabs[activeTab].followUp
-                    )
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  setActiveFollowUp(
+
+        <div className="chart-container">
+          {showContent ? (
+            activeFollowUp !== null && tabs[activeTab].followUp
+              ? tabs[activeTab].followUp[activeFollowUp].answer
+              : tabs[activeTab].chart
+          ) : (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              height: '100%', 
+              color: '#f0f0f0',
+              fontSize: '1.2em'
+            }}>
+              Listening to question...
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Section - Reserved Space for Follow-up Questions */}
+      <div className="bottom-reserved-space">
+        <div className={`follow-up-container ${showFollowUps && tabs[activeTab].followUp ? 'visible' : 'hidden'}`}>
+          {showFollowUps && tabs[activeTab].followUp ? (
+            <>
+              <h3>Follow-up Questions:</h3>
+              {tabs[activeTab].followUp.map((q, index) => (
+                <div
+                  key={index}
+                  className={`question ${
                     activeFollowUp === index &&
-                      activeTab ===
-                        tabs.findIndex(
-                          (t) => t.followUp === tabs[activeTab].followUp
-                        )
-                      ? null
-                      : index
-                  )
-                }
-              >
-                <h4>{q.question}</h4>
-              </div>
-            ))}
-          </div>
-        )}
+                    activeTab ===
+                      tabs.findIndex(
+                        (t) => t.followUp === tabs[activeTab].followUp
+                      )
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setActiveFollowUp(
+                      activeFollowUp === index &&
+                        activeTab ===
+                          tabs.findIndex(
+                            (t) => t.followUp === tabs[activeTab].followUp
+                          )
+                        ? null
+                        : index
+                    )
+                  }
+                >
+                  <h4>{q.question}</h4>
+                </div>
+              ))}
+            </>
+          ) : (
+            <div className="follow-up-placeholder"></div>
+          )}
+        </div>
       </div>
     </div>
   );

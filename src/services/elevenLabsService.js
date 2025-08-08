@@ -5,9 +5,10 @@ const DEFAULT_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam voice
  * Converts text to speech using ElevenLabs API and plays the audio
  * @param {string} text - The text to convert to speech
  * @param {string} voiceId - The ElevenLabs voice ID (optional, uses default if not provided)
+ * @param {Function} onComplete - Optional callback function called when audio finishes playing
  * @returns {Promise<void>}
  */
-export const speakText = async (text, voiceId = DEFAULT_VOICE_ID) => {
+export const speakText = async (text, voiceId = DEFAULT_VOICE_ID, onComplete = null) => {
   try {
     console.log('🔊 speakText called with:', { text: text.substring(0, 50) + '...', voiceId });
     console.log('🔑 API Key present:', !!import.meta.env.VITE_ELEVENLABS_API_KEY);
@@ -57,6 +58,12 @@ export const speakText = async (text, voiceId = DEFAULT_VOICE_ID) => {
     audio.addEventListener('ended', () => {
       URL.revokeObjectURL(audioUrl);
       console.log('🔇 ElevenLabs audio finished playing');
+      
+      // Call the completion callback if provided
+      if (onComplete && typeof onComplete === 'function') {
+        console.log('📞 Calling completion callback');
+        onComplete();
+      }
     });
     
     console.log('🎵 Playing ElevenLabs audio...');
@@ -68,21 +75,31 @@ export const speakText = async (text, voiceId = DEFAULT_VOICE_ID) => {
     console.log('🔄 Falling back to browser TTS');
     
     // Fallback to browser speech synthesis
-    fallbackToSpeechSynthesis(text);
+    fallbackToSpeechSynthesis(text, onComplete);
   }
 };
 
 /**
  * Fallback function using browser's built-in speech synthesis
  * @param {string} text - The text to speak
+ * @param {Function} onComplete - Optional callback function called when speech finishes
  */
-const fallbackToSpeechSynthesis = (text) => {
+const fallbackToSpeechSynthesis = (text, onComplete = null) => {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel(); // Stop any previous speech
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1;
     utterance.pitch = 1;
     utterance.lang = 'en-IN';
+    
+    // Add event listener for completion callback
+    if (onComplete && typeof onComplete === 'function') {
+      utterance.addEventListener('end', () => {
+        console.log('📞 Fallback TTS completion callback');
+        onComplete();
+      });
+    }
+    
     window.speechSynthesis.speak(utterance);
   }
 };
@@ -91,33 +108,69 @@ const fallbackToSpeechSynthesis = (text) => {
  * Speaks two texts sequentially: first the question, then the answer
  * @param {string} questionText - The question text to speak first
  * @param {string} answerText - The answer text to speak after the question
- * @param {string} voiceId - The ElevenLabs voice ID (optional, uses default if not provided)
+ * @param {string} questionVoiceId - The ElevenLabs voice ID for the question (optional, uses default if not provided)
+ * @param {string} answerVoiceId - The ElevenLabs voice ID for the answer (optional, uses default if not provided)
+ * @param {Function} onAnswerStart - Optional callback called when answer audio begins
+ * @param {Function} onComplete - Optional callback called when all audio finishes
  * @returns {Promise<void>}
  */
-export const speakSequentially = async (questionText, answerText, voiceId = DEFAULT_VOICE_ID) => {
-  try {
-    console.log('🎯 Speaking sequentially:', { 
-      question: questionText.substring(0, 30) + '...', 
-      answer: answerText.substring(0, 30) + '...' 
-    });
+export const speakSequentially = async (questionText, answerText, questionVoiceId = DEFAULT_VOICE_ID, answerVoiceId = DEFAULT_VOICE_ID, onAnswerStart = null, onComplete = null) => {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log('🎯 Speaking sequentially:', { 
+        question: questionText.substring(0, 30) + '...', 
+        answer: answerText.substring(0, 30) + '...',
+        questionVoice: questionVoiceId,
+        answerVoice: answerVoiceId
+      });
 
-    // First, speak the question
-    await speakText(questionText, voiceId);
-    
-    // Add a small pause between question and answer
-    await new Promise(resolve => setTimeout(resolve, 800)); // 0.8 second pause
-    
-    // Then, speak the answer
-    await speakText(answerText, voiceId);
-    
-    console.log('✅ Sequential speaking completed');
-    
-  } catch (error) {
-    console.error('❌ Sequential speaking error:', error);
-    
-    // Fallback: just speak the answer if there's an issue
-    fallbackToSpeechSynthesis(answerText);
-  }
+      // First, speak the question with a completion callback
+      speakText(questionText, questionVoiceId, () => {
+        console.log('✅ Question audio completed');
+        
+        // Generate random pause between 2-4 seconds (2000-4000ms)
+        const randomPause = Math.floor(Math.random() * 2000) + 2000;
+        console.log(`⏸️ Random pause: ${randomPause}ms`);
+        
+        // Wait for the random pause, then speak the answer
+        setTimeout(() => {
+          console.log('🎙️ Starting answer audio...');
+          
+          // Start the answer audio first
+          speakText(answerText, answerVoiceId, () => {
+            console.log('✅ Sequential speaking completed');
+            
+            // Call the onComplete callback if provided
+            if (onComplete && typeof onComplete === 'function') {
+              console.log('📞 Calling onComplete callback');
+              onComplete();
+            }
+            
+            resolve();
+          });
+          
+          // Show visual content after a 1-2 second delay from answer start
+          if (onAnswerStart && typeof onAnswerStart === 'function') {
+            const visualDelay = Math.floor(Math.random() * 1000) + 1000; // 1000-2000ms (1-2 seconds)
+            console.log(`📺 Visual content will appear in ${visualDelay}ms`);
+            
+            setTimeout(() => {
+              console.log('🎬 Triggering visual content display');
+              onAnswerStart();
+            }, visualDelay);
+          }
+          
+        }, randomPause);
+      });
+      
+    } catch (error) {
+      console.error('❌ Sequential speaking error:', error);
+      
+      // Fallback: just speak the answer if there's an issue
+      fallbackToSpeechSynthesis(answerText, () => resolve());
+      reject(error);
+    }
+  });
 };
 
 /**
