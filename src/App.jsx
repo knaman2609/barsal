@@ -65,7 +65,7 @@ const conversionFunnelData = {
     {
       label: 'Conversion Funnel',
       data: [1000, 800, 500, 200],
-      backgroundColor: '#8FBC8F',
+      backgroundColor: '#f0f0f0',
       barThickness: 20,
     },
   ],
@@ -77,7 +77,8 @@ const revenueData = {
     {
       label: 'Revenue',
       data: [4000, 3000, 2000, 1000, 500],
-      backgroundColor: ['#8FBC8F', '#F0E68C', '#ADD8E6', '#DDA0DD', '#B0C4DE'],
+      backgroundColor: '#f0f0f0',
+      barThickness: 20,
     },
   ],
 };
@@ -88,7 +89,8 @@ const leadSourceData = {
     {
       label: 'Lead Source',
       data: [400, 300, 200, 100],
-      backgroundColor: ['#8FBC8F', '#F0E68C', '#ADD8E6', '#DDA0DD'],
+      backgroundColor: '#f0f0f0',
+      barThickness: 20,
     },
   ],
 };
@@ -99,7 +101,7 @@ const marketingChannelData = {
         {
             label: 'Marketing Channel Performance',
             data: [250, 200, 300, 150, 100],
-            backgroundColor: '#8FBC8F',
+            backgroundColor: '#f0f0f0',
             barThickness: 20,
         },
     ],
@@ -112,8 +114,8 @@ const ValueDisplay = ({ value }) => (
 );
 
 const ConversionFunnelChart = () => <Bar data={conversionFunnelData} options={chartOptions} />;
-const RevenueChart = () => <Pie data={revenueData} options={{ plugins: { legend: { labels: { color: '#f0f0f0' } } } }} />;
-const LeadSourceChart = () => <Pie data={leadSourceData} options={{ plugins: { legend: { labels: { color: '#f0f0f0' } } } }} />;
+const RevenueChart = () => <Bar data={revenueData} options={chartOptions} />;
+const LeadSourceChart = () => <Bar data={leadSourceData} options={chartOptions} />;
 const MarketingChannelChart = () => <Bar data={marketingChannelData} options={chartOptions} />;
 
 function App() {
