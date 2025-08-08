@@ -244,10 +244,22 @@ const TopRegionsChart = () => <Bar data={topRegionsData} options={chartOptions} 
 
 function App() {
   const [activeTab, setActiveTab] = useState(0);
+  const [activeFollowUp, setActiveFollowUp] = useState(null);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
+  const followUpQuestions = [
+    { question: "What is the conversion rate at each stage?", answer: <ValueDisplay value={"Leads: 100%, Contacted: 80%, Demo: 62.5%, Won: 40%"} /> },
+    { question: "How does the funnel compare to last month?", answer: <ValueDisplay value={"-5%"} label="vs Last Month" /> },
+    { question: "Which marketing channels are driving the most conversions?", answer: <MarketingChannelChart /> },
+    { question: "What is the drop-off rate between each stage?", answer: <ValueDisplay value={"Leads -> Contacted: 20%, Contacted -> Demo: 22.5%, Demo -> Won: 60%"} /> },
+  ];
+
   const tabs = [
-    { question: "What is my conversion funnel?", chart: <ConversionFunnelChart /> },
+    {
+      question: "What is my conversion funnel?",
+      chart: <ConversionFunnelChart />,
+      followUp: followUpQuestions,
+    },
     { question: "How much revenue did I process through Cards/UPI/Netbanking/COD/Others?", chart: <RevenueChart /> },
     { question: "What is my conversion rate?", chart: <ValueDisplay value={`${conversionRate.toFixed(2)}%`} /> },
     { question: "What is the source of my leads?", chart: <LeadSourceChart /> },
@@ -331,7 +343,10 @@ function App() {
           <div
             key={index}
             className={`question ${activeTab === index ? 'active' : ''}`}
-            onClick={() => setActiveTab(index)}
+            onClick={() => {
+              setActiveTab(index);
+              setActiveFollowUp(null);
+            }}
           >
             <h2>{tab.question}</h2>
           </div>
@@ -339,8 +354,22 @@ function App() {
       </div>
       <div className="right-panel">
         <div className="chart-container">
-          {tabs[activeTab].chart}
+          {activeFollowUp !== null && activeTab === 0 ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>
+        {tabs[activeTab].followUp && (
+          <div className="follow-up-container">
+            <h3>Follow-up Questions:</h3>
+            {tabs[activeTab].followUp.map((q, index) => (
+              <div
+                key={index}
+                className={`question ${activeFollowUp === index ? 'active' : ''}`}
+                onClick={() => setActiveFollowUp(activeFollowUp === index ? null : index)}
+              >
+                <h4>{q.question}</h4>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

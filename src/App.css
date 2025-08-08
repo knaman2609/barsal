@@ -34,7 +34,7 @@ body {
   padding: 10px 20px;
   cursor: pointer;
   border: 1px solid #555;
-  border-radius: 8px;
+  border-radius: 0;
   background-color: #2a2a2a;
   transition: background-color 0.3s, border-color 0.3s;
 }
@@ -50,7 +50,7 @@ body {
 
 .chart-container {
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 0;
   background-color: #2a2a2a;
   height: 400px; /* Or any other fixed height */
   width: 100%; /* Or any other fixed width */
@@ -66,4 +66,31 @@ body {
 
 h2{
     font-size: 1em;
+}
+
+.follow-up-container {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #2a2a2a;
+  border-radius: 0;
+  width: 800px;
+}
+
+.follow-up-container h3 {
+  margin-top: 0;
+  color: #f0f0f0;
+}
+
+.follow-up-container .question {
+  background-color: #3a3a3a;
+}
+
+.follow-up-container .question.active {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.follow-up-container h4 {
+  font-weight: normal;
+  margin: 0;
 }
