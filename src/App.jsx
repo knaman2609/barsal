@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import { Bar, Pie, Line } from "react-chartjs-2";
+import { speakSequentially } from "./services/elevenLabsService.js";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -1264,7 +1265,6 @@ function App() {
           voice: "Peak hours (6–9 PM) saw 4,000 orders.",
         },
       ],
-      voice: "We recorded 12,345 orders during the selected period.",
     },
     {
       question: "What are my net sales?",
@@ -2796,30 +2796,29 @@ function App() {
   ];
 
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      "speechSynthesis" in window &&
-      tabs[activeTab].voice
-    ) {
-      const chartAnswer = tabs[activeTab].chart.props.value;
-      const followUpChartAnswer =
-        tabs[activeTab].followUp[activeFollowUp]?.answer?.props?.value;
-      var toSpeak = chartAnswer || tabs[activeTab].voice;
+    if (tabs[activeTab].voice) {
+      let questionText, answerText;
+      
       if (activeFollowUp !== null) {
-        toSpeak =
-          followUpChartAnswer || tabs[activeTab].followUp[activeFollowUp].voice;
+        // For follow-up questions
+        questionText = tabs[activeTab].followUp[activeFollowUp].question;
+        const followUpChartAnswer = tabs[activeTab].followUp[activeFollowUp]?.answer?.props?.value;
+        answerText = followUpChartAnswer || tabs[activeTab].followUp[activeFollowUp].voice;
+      } else {
+        // For main questions
+        questionText = tabs[activeTab].question;
+        const chartAnswer = tabs[activeTab].chart.props.value;
+        answerText = chartAnswer || tabs[activeTab].voice;
       }
-      window.speechSynthesis.cancel(); // Stop any previous speech
-      const utter = new window.SpeechSynthesisUtterance(toSpeak);
-      utter.rate = 1;
-      utter.pitch = 1;
-      utter.lang = "en-IN";
-      window.speechSynthesis.speak(utter);
+      
+      // Speak question first, then answer using ElevenLabs
+      speakSequentially(questionText, answerText);
     }
   }, [activeTab, activeFollowUp]);
 
+
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container debug bg-gray-900">
       <div className="dropdown-container">
         <CustomSelect
           options={tabs}
