@@ -33,7 +33,7 @@ body {
 .question {
   padding: 10px 20px;
   cursor: pointer;
-  border: 1px solid #555;
+  border: none;
   border-radius: 0;
   background-color: #2a2a2a;
   transition: background-color 0.3s, border-color 0.3s;
@@ -45,7 +45,6 @@ body {
 
 .question.active {
   background-color: #000000;
-  border-color: #000000;
 }
 
 .chart-container {
@@ -83,11 +82,11 @@ h2{
 
 .follow-up-container .question {
   background-color: #3a3a3a;
+  border-bottom: 1px solid #555;
 }
 
 .follow-up-container .question.active {
   background-color: #000000;
-  border-color: #000000;
 }
 
 .follow-up-container h4 {
