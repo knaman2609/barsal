@@ -65,7 +65,7 @@ const conversionFunnelData = {
     {
       label: 'Conversion Funnel',
       data: [1000, 800, 500, 200],
-      backgroundColor: '#f0f0f0',
+      backgroundColor: '#8FBC8F',
       barThickness: 20,
     },
   ],
@@ -77,7 +77,7 @@ const revenueData = {
     {
       label: 'Revenue',
       data: [4000, 3000, 2000, 1000, 500],
-      backgroundColor: ['#e0e0e0', '#b0b0b0', '#808080', '#505050', '#202020'],
+      backgroundColor: ['#8FBC8F', '#F0E68C', '#ADD8E6', '#DDA0DD', '#B0C4DE'],
     },
   ],
 };
@@ -88,7 +88,7 @@ const leadSourceData = {
     {
       label: 'Lead Source',
       data: [400, 300, 200, 100],
-      backgroundColor: ['#e0e0e0', '#b0b0b0', '#808080', '#505050'],
+      backgroundColor: ['#8FBC8F', '#F0E68C', '#ADD8E6', '#DDA0DD'],
     },
   ],
 };
@@ -99,7 +99,7 @@ const marketingChannelData = {
         {
             label: 'Marketing Channel Performance',
             data: [250, 200, 300, 150, 100],
-            backgroundColor: '#f0f0f0',
+            backgroundColor: '#8FBC8F',
             barThickness: 20,
         },
     ],
