@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
@@ -730,6 +730,7 @@ function App() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showQuestion, setShowQuestion] = useState(true);
   const [showChart, setShowChart] = useState(true);
+  const timersRef = useRef([]);
   const [showFollowUps, setShowFollowUps] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [displayedQuestion, setDisplayedQuestion] = useState(null);
@@ -737,13 +738,14 @@ function App() {
   const [statusText, setStatusText] = useState('');
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
-  const speak = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = speechSynthesis.getVoices();
-    const selectedVoice = voices.find(voice => voice.name === 'Google US English') || voices.find(voice => voice.lang === 'en-US') || voices[0];
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+  const speakAnswer = (answer) => {
+    let textToSpeak;
+    if (typeof answer?.props?.value === 'string') {
+      textToSpeak = answer.props.value;
+    } else {
+      textToSpeak = "Here is a breakdown of your query";
     }
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
     speechSynthesis.speak(utterance);
   };
 
@@ -1355,9 +1357,12 @@ function App() {
   ];
 
   useEffect(() => {
+    // Clear previous timers
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+
     if (currentQuestion) {
       setStatusText(<span>Listening<span className="dots">...</span></span>);
-      speak(currentQuestion);
       setShowQuestion(false);
       setShowChart(false);
       setShowFollowUps(false);
@@ -1377,23 +1382,28 @@ function App() {
           setShowChart(true);
           setStatusText('');
 
+          const currentTab = tabs[activeTab];
+          const answer = activeFollowUp !== null ? currentTab.followUp[activeFollowUp].answer : currentTab.chart;
+          speakAnswer(answer);
+
           const followUpTimer = setTimeout(() => {
             if (activeFollowUp === null) {
               setShowFollowUps(true);
               const listeningTimer = setTimeout(() => {
                 setStatusText(<span>Listening<span className="dots">...</span></span>);
               }, 10000);
-              return () => clearTimeout(listeningTimer);
+              timersRef.current.push(listeningTimer);
             }
           }, 5000);
-
-          return () => clearTimeout(followUpTimer);
+          timersRef.current.push(followUpTimer);
         }, 8000);
-
-        return () => clearTimeout(chartTimer);
+        timersRef.current.push(chartTimer);
       }, audioDelay);
+      timersRef.current.push(textTimer);
 
-      return () => clearTimeout(textTimer);
+      return () => {
+        timersRef.current.forEach(clearTimeout);
+      };
     }
   }, [currentQuestion, activeFollowUp]);
 
@@ -1408,6 +1418,8 @@ function App() {
             key={index}
             className={`question ${activeTab === index ? 'active' : ''}`}
             onClick={() => {
+              timersRef.current.forEach(clearTimeout);
+              timersRef.current = [];
               setActiveTab(index);
               setActiveFollowUp(null);
               setCurrentQuestion(tabs[index].question);
