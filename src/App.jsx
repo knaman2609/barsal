@@ -728,6 +728,9 @@ function App() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeFollowUp, setActiveFollowUp] = useState(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [showQuestion, setShowQuestion] = useState(true);
+  const [showChart, setShowChart] = useState(true);
+  const [showFollowUps, setShowFollowUps] = useState(true);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
   const followUpQuestions = [
@@ -1351,6 +1354,17 @@ function App() {
               setActiveTab(index);
               setActiveFollowUp(null);
               setIsNavOpen(false);
+              setShowQuestion(true);
+              setShowChart(false);
+              setShowFollowUps(false);
+
+              setTimeout(() => {
+                setShowChart(true);
+              }, 2000);
+
+              setTimeout(() => {
+                setShowFollowUps(true);
+              }, 7000);
             }}
           >
             <h2>{tab.question}</h2>
@@ -1358,11 +1372,11 @@ function App() {
         ))}
       </div>
       <div className="right-panel">
-        <h1 className="current-question">{tabs[activeTab].question}</h1>
-        <div className="chart-container">
+        {showQuestion && <h1 className="current-question">{tabs[activeTab].question}</h1>}
+        {showChart && <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
-        </div>
-        {tabs[activeTab].followUp && (
+        </div>}
+        {showFollowUps && tabs[activeTab].followUp && (
           <div className="follow-up-container">
             <h3>Follow-up Questions:</h3>
             {tabs[activeTab].followUp.map((q, index) => (
