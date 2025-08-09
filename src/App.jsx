@@ -1356,7 +1356,7 @@ function App() {
 
   useEffect(() => {
     if (currentQuestion) {
-      setStatusText('Listening...');
+      setStatusText(<span>Listening<span className="dots">...</span></span>);
       speak(currentQuestion);
       setShowQuestion(false);
       setShowChart(false);
@@ -1370,7 +1370,7 @@ function App() {
         setDisplayedQuestion(currentQuestion);
         setShowQuestion(true);
         setIsLoading(true);
-        setStatusText('Thinking...');
+        setStatusText(<span>Thinking<span className="dots">...</span></span>);
 
         const chartTimer = setTimeout(() => {
           setIsLoading(false);
@@ -1380,6 +1380,10 @@ function App() {
           const followUpTimer = setTimeout(() => {
             if (activeFollowUp === null) {
               setShowFollowUps(true);
+              const listeningTimer = setTimeout(() => {
+                setStatusText(<span>Listening<span className="dots">...</span></span>);
+              }, 10000);
+              return () => clearTimeout(listeningTimer);
             }
           }, 5000);
 

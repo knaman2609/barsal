@@ -140,3 +140,13 @@ h2{
   font-size: 1.2em;
   font-family: 'Courier New', Courier, monospace;
 }
+
+.dots {
+  animation: blink 1s steps(5, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
