@@ -747,7 +747,7 @@ function App() {
     setShowFollowUps(false);
   };
 
-  const speakAnswer = (question, answer, summary, onEnd) => {
+  const speakAnswer = async (question, answer, summary, onEnd) => {
     let textToSpeak;
     if (summary) {
       textToSpeak = summary;
@@ -756,9 +756,43 @@ function App() {
     } else {
       textToSpeak = `Here is a breakdown of ${question}`;
     }
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.onend = onEnd;
-    speechSynthesis.speak(utterance);
+
+    const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
+    const voiceId = '21m00Tcm4TlvDq8ikWAM'; // Default voice ID
+
+    try {
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          text: textToSpeak,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.5,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch audio from Eleven Labs');
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.onended = onEnd;
+      audio.play();
+    } catch (error) {
+      console.error('Error with Eleven Labs API:', error);
+      // Fallback to browser's speech synthesis
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.onend = onEnd;
+      speechSynthesis.speak(utterance);
+    }
   };
 
   const tabs = [
