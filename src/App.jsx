@@ -735,6 +735,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const selectedVoice = voices.find(voice => voice.name === 'Google US English') || voices.find(voice => voice.lang === 'en-US') || voices[0];
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+    speechSynthesis.speak(utterance);
+  };
+
   const followUpQuestions = [
     { question: "What is the conversion rate at each stage?", answer: <ConversionRateStageChart /> },
     { question: "How does the funnel compare to last month?", answer: <ValueDisplay value={"This month's overall conversion rate is 20%, which is a 5% decrease from last month's 25%."} /> },
@@ -1344,6 +1354,7 @@ function App() {
 
   useEffect(() => {
     if (currentQuestion) {
+      speak(currentQuestion);
       setIsLoading(true);
       setShowChart(false);
       setShowFollowUps(false);
