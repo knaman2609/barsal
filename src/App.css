@@ -67,6 +67,7 @@ body {
 }
 
 .chart-container {
+  position: relative;
   padding: 20px;
   border-radius: 0;
   background-color: #2a2a2a;
@@ -75,6 +76,26 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.text-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.spoken-text-container {
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 300px;
+  z-index: 1001;
 }
 
 .chart-container > canvas {
@@ -129,14 +150,16 @@ h2{
 
 .follow-up-container h4 {
   margin: 0;
-  font-weight: normal;
+  
   font-size: calc(0.9em - 2px);
 }
 
 .back-arrow {
   font-size: 1.2em;
   cursor: pointer;
-  transform: translateY(-2px);
+
+  transform: translateY(-11px);
+  font-size: xx-large;
 }
 
 .current-question {

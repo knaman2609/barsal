@@ -736,6 +736,7 @@ function App() {
   const [displayedQuestion, setDisplayedQuestion] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusText, setStatusText] = useState('');
+  const [showSpokenText, setShowSpokenText] = useState(false);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
   const selectRandomQuestion = () => {
@@ -799,21 +800,21 @@ function App() {
     {
       question: "What is my conversion funnel?",
       chart: <ConversionFunnelChart />,
-      summary: "This chart shows your conversion funnel, starting with 1000 leads, of which 800 were contacted, 500 received a demo, and 200 were won.",
+      summary: "Your conversion funnel shows that out of every 1000 leads, 200 become customers, resulting in a 20% conversion rate.",
       followUp: [
-        { question: "What is the conversion rate at each stage?", answer: <ConversionRateStageChart />, summary: "This chart shows the conversion rate at each stage of the funnel. The conversion rate from Leads to Contacted is 80%, from Contacted to Demo is 62.5%, and from Demo to Won is 40%." },
+        { question: "What is the conversion rate at each stage?", answer: <ConversionRateStageChart />, summary: "The conversion rate from Leads to Contacted is 80%, from Contacted to Demo is 62.5%, and from Demo to Won is 40%." },
         { question: "How does the funnel compare to last month?", answer: <ValueDisplay value={"This month's overall conversion rate is 20%, which is a 5% decrease from last month's 25%."} /> },
-        { question: "Which marketing channels are driving the most conversions?", answer: <MarketingChannelChart />, summary: "This chart shows the performance of your marketing channels. SEO is the top-performing channel with 300 conversions, followed by Google Ads with 250." },
-        { question: "What is the drop-off rate between each stage?", answer: <DropOffRateChart />, summary: "This chart displays the drop-off rate between each stage of the funnel. The highest drop-off is from Demo to Won at 60%." },
+        { question: "Which marketing channels are driving the most conversions?", answer: <MarketingChannelChart />, summary: "SEO and Google Ads are your top-performing marketing channels, driving the most conversions." },
+        { question: "What is the drop-off rate between each stage?", answer: <DropOffRateChart />, summary: "The highest drop-off is from Demo to Won at 60%." },
       ],
     },
     {
       question: "How much revenue did I process through Cards/UPI/Netbanking/COD/Others?",
       chart: <RevenueChart />,
-      summary: "This chart breaks down your revenue by payment method. Cards are the highest at 4000, followed by UPI at 3000, and Netbanking at 2000.",
+      summary: "Cards and UPI are your top revenue drivers, contributing the most to your total sales.",
       followUp: [
         { question: "What is the revenue from credit cards vs debit cards?", answer: <ValueDisplay value={"The revenue from credit cards is ₹2500 and from debit cards is ₹1500."} /> },
-        { question: "Which UPI app is used the most?", answer: <UpiAppChart />, summary: "This chart shows the usage of different UPI apps. Google Pay is the most used app with 500 transactions, followed by PhonePe with 400." },
+        { question: "Which UPI app is used the most?", answer: <UpiAppChart />, summary: "Google Pay is the most used UPI app, followed by PhonePe." },
       ]
     },
     {
@@ -827,7 +828,7 @@ function App() {
     {
       question: "What is the source of my leads?",
       chart: <LeadSourceChart />,
-      summary: "This chart displays the sources of your leads. Organic search is the top source with 400 leads, followed by paid channels with 300.",
+      summary: "The majority of your leads come from organic search, with paid channels being the second most significant source.",
       followUp: [
         { question: "Which paid channel has the highest ROI?", answer: <ValueDisplay value={"Google Ads has the highest ROI of 4.5x, followed by Facebook Ads with an ROI of 3.8x."} /> },
         { question: "What is the conversion rate from organic search?", answer: <ValueDisplay value={"The conversion rate from organic search is 18%."} /> },
@@ -836,10 +837,10 @@ function App() {
     {
       question: "Can you provide marketing channel performance?",
       chart: <MarketingChannelChart />,
-      summary: "This chart shows the performance of your marketing channels. SEO is the top-performing channel with 300 conversions, followed by Google Ads with 250.",
+      summary: "SEO and Google Ads are your top-performing marketing channels, driving the most conversions.",
       followUp: [
-        { question: "What is the cost per acquisition for each channel?", answer: <CpaChart />, summary: "This chart shows the cost per acquisition for each channel. Facebook has the highest CPA at 600, while Email has the lowest at 100." },
-        { question: "Which channel has the highest customer lifetime value?", answer: <ClvChart />, summary: "This chart displays the customer lifetime value for each channel. Email has the highest CLV at 5000, followed by SEO at 4000." },
+        { question: "What is the cost per acquisition for each channel?", answer: <CpaChart />, summary: "Facebook has the highest CPA, while Email has the lowest." },
+        { question: "Which channel has the highest customer lifetime value?", answer: <ClvChart />, summary: "Email has the highest CLV, followed by SEO." },
       ]
     },
     {
@@ -862,14 +863,14 @@ function App() {
       question: "How many failed transactions did I have?",
       chart: <ValueDisplay value={"You had 1,234 failed transactions in the selected period."} />,
       followUp: [
-        { question: "What are the top reasons for transaction failure?", answer: <FailureReasonsChart />, summary: "This chart shows the top reasons for transaction failure. Insufficient Funds is the most common reason with 400 failures." },
-        { question: "Which payment method has the most failures?", answer: <FailurePaymentMethodChart />, summary: "This chart displays the payment methods with the most failures. Netbanking has the highest number of failures with 500." },
+        { question: "What are the top reasons for transaction failure?", answer: <FailureReasonsChart />, summary: "The most common reason for transaction failures is insufficient funds." },
+        { question: "Which payment method has the most failures?", answer: <FailurePaymentMethodChart />, summary: "Netbanking experiences the highest number of transaction failures." },
       ]
     },
     {
       question: "What is the daily trend for transaction success rates?",
       chart: <DailyTrendChart />,
-      summary: "This chart shows the daily trend of your transaction success rates. The success rate has been consistently high, with a peak of 98% on Friday.",
+      summary: "Your transaction success rates are consistently high throughout the week, peaking on Friday.",
       followUp: [
         { question: "What was the success rate last Tuesday?", answer: <ValueDisplay value={"Last Tuesday's success rate was 96%."} /> },
         { question: "Why was the success rate low on Wednesday?", answer: <ValueDisplay value={"The success rate was low on Wednesday due to a temporary issue with one of our payment gateways."} /> },
@@ -878,7 +879,7 @@ function App() {
     {
       question: "What is the SR for different payment methods?",
       chart: <PaymentMethodSRChart />,
-      summary: "This chart shows the success rate for different payment methods. COD has the highest success rate at 99%, followed by UPI at 98%.",
+      summary: "COD and UPI have the highest success rates among all payment methods.",
       followUp: [
         { question: "Why is the success rate for Netbanking lower than others?", answer: <ValueDisplay value={"The success rate for Netbanking is lower because it has more steps in the payment flow, which leads to higher customer drop-offs."} /> },
         { question: "What is the success rate for EMI payments?", answer: <ValueDisplay value={"The success rate for EMI payments is 90%."} /> },
@@ -951,6 +952,7 @@ function App() {
     {
       question: "How many orders did I receive this week compared to last week?",
       chart: <WeeklyOrderTrendChart />,
+      summary: "You saw a significant increase in orders this week compared to the previous week.",
       followUp: [
         { question: "What was the percentage change in orders?", answer: <ValueDisplay value={"There was a 15% increase in orders this week compared to last week."} /> },
         { question: "Which day had the highest number of orders this week?", answer: <ValueDisplay value={"Saturday had the highest number of orders with 250."} /> },
@@ -959,6 +961,7 @@ function App() {
     {
       question: "What regions have the highest sales?",
       chart: <TopRegionsChart />,
+      summary: "Maharashtra and Karnataka are your top-performing regions in terms of sales.",
       followUp: [
         { question: "What are the top 3 cities in Maharashtra by sales?", answer: <TopCitiesMaharashtraChart /> },
         { question: "How does marketing spend correlate with sales in these regions?", answer: <RegionSalesMarketingChart /> },
@@ -967,6 +970,7 @@ function App() {
     {
       question: "Which regions are we gettign the most orders from?",
       chart: <TopRegionsChart />,
+      summary: "The majority of your orders are coming from Maharashtra and Karnataka.",
       followUp: [
         { question: "What is the AOV for each of these regions?", answer: <ValueDisplay value={"Maharashtra: ₹1200, Karnataka: ₹1100, Delhi: ₹1000"} /> },
         { question: "Which products are most popular in these regions?", answer: <ValueDisplay value={"Maharashtra: Electronics, Karnataka: Fashion, Delhi: Home Goods"} /> },
@@ -983,6 +987,7 @@ function App() {
     {
       question: "Identify my top 10 most loyal customers based on purchase frequency?",
       chart: <TableDisplay data={topCustomersData} columns={[{ key: 'name', title: 'Customer Name' }, { key: 'purchases', title: 'Purchases' }]} />,
+      summary: "Here are your top 10 most loyal customers based on their purchase frequency.",
       followUp: [
         { question: "What is the average lifetime value of these customers?", answer: <ValueDisplay value={"The average lifetime value of these top 10 customers is ₹15,000."} /> },
         { question: "Which products do they purchase most often?", answer: <ValueDisplay value={"Smartphones, Laptops, and Headphones"} /> },
@@ -1031,6 +1036,7 @@ function App() {
     {
       question: "What are my top 10 most bought products?",
       chart: <TableDisplay data={topProductsData} columns={[{ key: 'name', title: 'Product Name' }, { key: 'sales', title: 'Sales' }]} />,
+      summary: "Here are your top 10 most purchased products.",
       followUp: [
         { question: "What is the category breakdown of these top products?", answer: <TopProductsByCategoryChart /> },
         { question: "Which of these products are most frequently purchased together?", answer: <ValueDisplay value={"Smartphone and Headphones, Laptop and Wireless Mouse"} /> },
@@ -1039,6 +1045,7 @@ function App() {
     {
       question: "Which products are running low on stock?",
       chart: <TableDisplay data={lowStockProductsData} columns={[{ key: 'name', title: 'Product Name' }, { key: 'stock', title: 'Stock' }]} />,
+      summary: "Here are the products that are currently running low on stock.",
       followUp: [
         { question: "What is the estimated date for when these products will be out of stock?", answer: <ValueDisplay value={"The estimated out-of-stock dates are: Wireless Mouse in 5 days, Bluetooth Speaker in 8 days, and External Hard Drive in 10 days."} /> },
         { question: "Can you set up a low stock alert for these products?", answer: <LowStockAlertsChart /> },
@@ -1488,9 +1495,21 @@ function App() {
           )}
           <div className={`current-question ${showQuestion ? 'visible' : ''}`}>{displayedQuestion}</div>
         </div>
-        {showChart && <div className="chart-container">
-          {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
-        </div>}
+        {showChart && (
+          <div className="chart-container">
+            {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
+            <div className="text-icon" onClick={() => setShowSpokenText(!showSpokenText)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            {showSpokenText && (
+              <div className="spoken-text-container">
+                {activeFollowUp !== null ? tabs[activeTab].followUp[activeFollowUp].summary : tabs[activeTab].summary}
+              </div>
+            )}
+          </div>
+        )}
         {tabs[activeTab].followUp && !activeFollowUp && (
           <div className={`follow-up-container ${showFollowUps ? 'visible' : ''}`}>
             {tabs[activeTab].followUp.map((q, index) => (
