@@ -1355,9 +1355,17 @@ function App() {
   useEffect(() => {
     if (currentQuestion) {
       speak(currentQuestion);
+      setShowQuestion(false);
       setIsLoading(true);
       setShowChart(false);
       setShowFollowUps(false);
+
+      const wordCount = currentQuestion.split(' ').length;
+      const delay = (wordCount / 150) * 60 * 1000; // 150 words per minute
+
+      setTimeout(() => {
+        setShowQuestion(true);
+      }, delay);
 
       const timer1 = setTimeout(() => {
         setIsLoading(false);
@@ -1392,7 +1400,6 @@ function App() {
               setActiveFollowUp(null);
               setCurrentQuestion(tabs[index].question);
               setIsNavOpen(false);
-              setShowQuestion(true);
               setShowChart(false);
               setShowFollowUps(false);
             }}
@@ -1426,7 +1433,6 @@ function App() {
                 onClick={() => {
                   setActiveFollowUp(index);
                   setCurrentQuestion(q.question);
-                  setShowQuestion(true);
                   setShowChart(false);
                   setShowFollowUps(false);
                 }}
