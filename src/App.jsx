@@ -732,7 +732,9 @@ function App() {
   const [showChart, setShowChart] = useState(true);
   const [showFollowUps, setShowFollowUps] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [displayedQuestion, setDisplayedQuestion] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusText, setStatusText] = useState('');
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
   const speak = (text) => {
@@ -1354,34 +1356,40 @@ function App() {
 
   useEffect(() => {
     if (currentQuestion) {
+      setStatusText('Listening...');
       speak(currentQuestion);
       setShowQuestion(false);
-      setIsLoading(true);
       setShowChart(false);
       setShowFollowUps(false);
+      setIsLoading(false);
 
       const wordCount = currentQuestion.split(' ').length;
-      const delay = (wordCount / 150) * 60 * 1000; // 150 words per minute
+      const audioDelay = (wordCount / 150) * 60 * 1000; // 150 words per minute
 
-      setTimeout(() => {
+      const textTimer = setTimeout(() => {
+        setDisplayedQuestion(currentQuestion);
         setShowQuestion(true);
-      }, delay);
+        setIsLoading(true);
+        setStatusText('Thinking...');
 
-      const timer1 = setTimeout(() => {
-        setIsLoading(false);
-        setShowChart(true);
-      }, 4000);
+        const chartTimer = setTimeout(() => {
+          setIsLoading(false);
+          setShowChart(true);
+          setStatusText('');
 
-      const timer2 = setTimeout(() => {
-        if (activeFollowUp === null) {
-          setShowFollowUps(true);
-        }
-      }, 7000);
+          const followUpTimer = setTimeout(() => {
+            if (activeFollowUp === null) {
+              setShowFollowUps(true);
+            }
+          }, 5000);
 
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-      };
+          return () => clearTimeout(followUpTimer);
+        }, 8000);
+
+        return () => clearTimeout(chartTimer);
+      }, audioDelay);
+
+      return () => clearTimeout(textTimer);
     }
   }, [currentQuestion, activeFollowUp]);
 
@@ -1417,9 +1425,9 @@ function App() {
               setShowFollowUps(true);
             }}>&#x2190;</div>
           )}
-          {showQuestion && <div className="current-question">{currentQuestion}</div>}
+          <div className={`current-question ${showQuestion ? 'visible' : ''}`}>{displayedQuestion}</div>
         </div>
-        {isLoading && <div className="glowing-bar"></div>}
+        <div className="status-text">{statusText}</div>
         {showChart && <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>}
