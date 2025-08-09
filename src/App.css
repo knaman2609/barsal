@@ -15,14 +15,33 @@ body {
   padding: 20px;
 }
 
+.nav-icon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
 .left-panel {
+  position: fixed;
+  top: 0;
+  left: -500px; /* Hidden by default */
   width: 500px;
+  height: 100%;
+  background-color: #1a1a1a;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 600px;
   overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 1000;
+}
+
+.left-panel.open {
+  left: 0; /* Shown when open */
 }
 
 .right-panel {
@@ -92,4 +111,10 @@ h2{
 .follow-up-container h4 {
   font-weight: normal;
   margin: 0;
+}
+
+.current-question {
+  font-size: 1.2em;
+  margin-top: -20px;
+  margin-bottom: 20px;
 }

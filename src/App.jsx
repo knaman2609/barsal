@@ -727,6 +727,7 @@ const HighRiskPincodesChart = () => <Bar data={highRiskPincodesData} options={ch
 function App() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeFollowUp, setActiveFollowUp] = useState(null);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
   const followUpQuestions = [
@@ -1338,7 +1339,10 @@ function App() {
 
   return (
     <div className="dashboard-container">
-      <div className="left-panel">
+      <div className="nav-icon" onClick={() => setIsNavOpen(!isNavOpen)}>
+        &#9776;
+      </div>
+      <div className={`left-panel ${isNavOpen ? 'open' : ''}`}>
         {tabs.map((tab, index) => (
           <div
             key={index}
@@ -1346,6 +1350,7 @@ function App() {
             onClick={() => {
               setActiveTab(index);
               setActiveFollowUp(null);
+              setIsNavOpen(false);
             }}
           >
             <h2>{tab.question}</h2>
@@ -1353,6 +1358,7 @@ function App() {
         ))}
       </div>
       <div className="right-panel">
+        <h1 className="current-question">{tabs[activeTab].question}</h1>
         <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>
