@@ -732,6 +732,7 @@ function App() {
   const [showChart, setShowChart] = useState(true);
   const [showFollowUps, setShowFollowUps] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
   const followUpQuestions = [
@@ -1343,9 +1344,14 @@ function App() {
 
   useEffect(() => {
     if (currentQuestion) {
+      setIsLoading(true);
+      setShowChart(false);
+      setShowFollowUps(false);
+
       const timer1 = setTimeout(() => {
+        setIsLoading(false);
         setShowChart(true);
-      }, 2000);
+      }, 4000);
 
       const timer2 = setTimeout(() => {
         if (activeFollowUp === null) {
@@ -1395,6 +1401,7 @@ function App() {
           )}
           {showQuestion && <div className="current-question">{currentQuestion}</div>}
         </div>
+        {isLoading && <div className="glowing-bar"></div>}
         {showChart && <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>}
