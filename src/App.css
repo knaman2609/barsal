@@ -139,6 +139,12 @@ h2{
   color: #f0f0f0;
   font-size: 1.2em;
   font-family: 'Courier New', Courier, monospace;
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+}
+
+.status-text.visible {
+  opacity: 1;
 }
 
 .dots {

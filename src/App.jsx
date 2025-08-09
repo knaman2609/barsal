@@ -738,36 +738,38 @@ function App() {
   const [statusText, setStatusText] = useState('');
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
-  const speakAnswer = (answer) => {
+  const speakAnswer = (question, answer, summary) => {
     let textToSpeak;
-    if (typeof answer?.props?.value === 'string') {
+    if (summary) {
+      textToSpeak = summary;
+    } else if (typeof answer?.props?.value === 'string') {
       textToSpeak = answer.props.value;
     } else {
-      textToSpeak = "Here is a breakdown of your query";
+      textToSpeak = `Here is a breakdown of ${question}`;
     }
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     speechSynthesis.speak(utterance);
   };
 
-  const followUpQuestions = [
-    { question: "What is the conversion rate at each stage?", answer: <ConversionRateStageChart /> },
-    { question: "How does the funnel compare to last month?", answer: <ValueDisplay value={"This month's overall conversion rate is 20%, which is a 5% decrease from last month's 25%."} /> },
-    { question: "Which marketing channels are driving the most conversions?", answer: <MarketingChannelChart /> },
-    { question: "What is the drop-off rate between each stage?", answer: <DropOffRateChart /> },
-  ];
-
   const tabs = [
     {
       question: "What is my conversion funnel?",
       chart: <ConversionFunnelChart />,
-      followUp: followUpQuestions,
+      summary: "This chart shows your conversion funnel, starting with 1000 leads, of which 800 were contacted, 500 received a demo, and 200 were won.",
+      followUp: [
+        { question: "What is the conversion rate at each stage?", answer: <ConversionRateStageChart />, summary: "This chart shows the conversion rate at each stage of the funnel. The conversion rate from Leads to Contacted is 80%, from Contacted to Demo is 62.5%, and from Demo to Won is 40%." },
+        { question: "How does the funnel compare to last month?", answer: <ValueDisplay value={"This month's overall conversion rate is 20%, which is a 5% decrease from last month's 25%."} /> },
+        { question: "Which marketing channels are driving the most conversions?", answer: <MarketingChannelChart />, summary: "This chart shows the performance of your marketing channels. SEO is the top-performing channel with 300 conversions, followed by Google Ads with 250." },
+        { question: "What is the drop-off rate between each stage?", answer: <DropOffRateChart />, summary: "This chart displays the drop-off rate between each stage of the funnel. The highest drop-off is from Demo to Won at 60%." },
+      ],
     },
     {
       question: "How much revenue did I process through Cards/UPI/Netbanking/COD/Others?",
       chart: <RevenueChart />,
+      summary: "This chart breaks down your revenue by payment method. Cards are the highest at 4000, followed by UPI at 3000, and Netbanking at 2000.",
       followUp: [
         { question: "What is the revenue from credit cards vs debit cards?", answer: <ValueDisplay value={"The revenue from credit cards is ₹2500 and from debit cards is ₹1500."} /> },
-        { question: "Which UPI app is used the most?", answer: <UpiAppChart /> },
+        { question: "Which UPI app is used the most?", answer: <UpiAppChart />, summary: "This chart shows the usage of different UPI apps. Google Pay is the most used app with 500 transactions, followed by PhonePe with 400." },
       ]
     },
     {
@@ -781,6 +783,7 @@ function App() {
     {
       question: "What is the source of my leads?",
       chart: <LeadSourceChart />,
+      summary: "This chart displays the sources of your leads. Organic search is the top source with 400 leads, followed by paid channels with 300.",
       followUp: [
         { question: "Which paid channel has the highest ROI?", answer: <ValueDisplay value={"Google Ads has the highest ROI of 4.5x, followed by Facebook Ads with an ROI of 3.8x."} /> },
         { question: "What is the conversion rate from organic search?", answer: <ValueDisplay value={"The conversion rate from organic search is 18%."} /> },
@@ -789,17 +792,18 @@ function App() {
     {
       question: "Can you provide marketing channel performance?",
       chart: <MarketingChannelChart />,
+      summary: "This chart shows the performance of your marketing channels. SEO is the top-performing channel with 300 conversions, followed by Google Ads with 250.",
       followUp: [
-        { question: "What is the cost per acquisition for each channel?", answer: <CpaChart /> },
-        { question: "Which channel has the highest customer lifetime value?", answer: <ClvChart /> },
+        { question: "What is the cost per acquisition for each channel?", answer: <CpaChart />, summary: "This chart shows the cost per acquisition for each channel. Facebook has the highest CPA at 600, while Email has the lowest at 100." },
+        { question: "Which channel has the highest customer lifetime value?", answer: <ClvChart />, summary: "This chart displays the customer lifetime value for each channel. Email has the highest CLV at 5000, followed by SEO at 4000." },
       ]
     },
     {
       question: "What is my ROAS?",
       chart: <ValueDisplay value={"Your Return on Ad Spend is 4.5x."} label="This means for every dollar spent on advertising, you are generating $4.50 in revenue." />,
       followUp: [
-        { question: "How has ROAS trended over the last 6 months?", answer: <RoasTrendChart /> },
-        { question: "What is the ROAS for my top 5 campaigns?", answer: <TopCampaignsRoasChart /> },
+        { question: "How has ROAS trended over the last 6 months?", answer: <RoasTrendChart />, summary: "This chart shows the trend of your Return on Ad Spend over the last 6 months. It has been steadily increasing, with a peak of 4.5x in May." },
+        { question: "What is the ROAS for my top 5 campaigns?", answer: <TopCampaignsRoasChart />, summary: "This chart displays the ROAS for your top 5 campaigns. Campaign A has the highest ROAS at 5.0x." },
       ]
     },
     {
@@ -814,13 +818,14 @@ function App() {
       question: "How many failed transactions did I have?",
       chart: <ValueDisplay value={"You had 1,234 failed transactions in the selected period."} />,
       followUp: [
-        { question: "What are the top reasons for transaction failure?", answer: <FailureReasonsChart /> },
-        { question: "Which payment method has the most failures?", answer: <FailurePaymentMethodChart /> },
+        { question: "What are the top reasons for transaction failure?", answer: <FailureReasonsChart />, summary: "This chart shows the top reasons for transaction failure. Insufficient Funds is the most common reason with 400 failures." },
+        { question: "Which payment method has the most failures?", answer: <FailurePaymentMethodChart />, summary: "This chart displays the payment methods with the most failures. Netbanking has the highest number of failures with 500." },
       ]
     },
     {
       question: "What is the daily trend for transaction success rates?",
       chart: <DailyTrendChart />,
+      summary: "This chart shows the daily trend of your transaction success rates. The success rate has been consistently high, with a peak of 98% on Friday.",
       followUp: [
         { question: "What was the success rate last Tuesday?", answer: <ValueDisplay value={"Last Tuesday's success rate was 96%."} /> },
         { question: "Why was the success rate low on Wednesday?", answer: <ValueDisplay value={"The success rate was low on Wednesday due to a temporary issue with one of our payment gateways."} /> },
@@ -829,6 +834,7 @@ function App() {
     {
       question: "What is the SR for different payment methods?",
       chart: <PaymentMethodSRChart />,
+      summary: "This chart shows the success rate for different payment methods. COD has the highest success rate at 99%, followed by UPI at 98%.",
       followUp: [
         { question: "Why is the success rate for Netbanking lower than others?", answer: <ValueDisplay value={"The success rate for Netbanking is lower because it has more steps in the payment flow, which leads to higher customer drop-offs."} /> },
         { question: "What is the success rate for EMI payments?", answer: <ValueDisplay value={"The success rate for EMI payments is 90%."} /> },
@@ -1362,44 +1368,36 @@ function App() {
     timersRef.current = [];
 
     if (currentQuestion) {
+      setDisplayedQuestion(currentQuestion);
+      setShowQuestion(true);
       setStatusText(<span>Listening<span className="dots">...</span></span>);
-      setShowQuestion(false);
       setShowChart(false);
       setShowFollowUps(false);
-      setIsLoading(false);
+      setIsLoading(true);
+      setStatusText(<span>Thinking<span className="dots">...</span></span>);
 
-      const wordCount = currentQuestion.split(' ').length;
-      const audioDelay = (wordCount / 150) * 60 * 1000; // 150 words per minute
+      const chartTimer = setTimeout(() => {
+        setIsLoading(false);
+        setShowChart(true);
+        setStatusText('');
 
-      const textTimer = setTimeout(() => {
-        setDisplayedQuestion(currentQuestion);
-        setShowQuestion(true);
-        setIsLoading(true);
-        setStatusText(<span>Thinking<span className="dots">...</span></span>);
+        const currentTab = tabs[activeTab];
+        const answer = activeFollowUp !== null ? currentTab.followUp[activeFollowUp].answer : currentTab.chart;
+        const summary = activeFollowUp !== null ? currentTab.followUp[activeFollowUp].summary : currentTab.summary;
+        speakAnswer(currentQuestion, answer, summary);
 
-        const chartTimer = setTimeout(() => {
-          setIsLoading(false);
-          setShowChart(true);
-          setStatusText('');
-
-          const currentTab = tabs[activeTab];
-          const answer = activeFollowUp !== null ? currentTab.followUp[activeFollowUp].answer : currentTab.chart;
-          speakAnswer(answer);
-
-          const followUpTimer = setTimeout(() => {
-            if (activeFollowUp === null) {
-              setShowFollowUps(true);
-              const listeningTimer = setTimeout(() => {
-                setStatusText(<span>Listening<span className="dots">...</span></span>);
-              }, 10000);
-              timersRef.current.push(listeningTimer);
-            }
-          }, 5000);
-          timersRef.current.push(followUpTimer);
-        }, 8000);
-        timersRef.current.push(chartTimer);
-      }, audioDelay);
-      timersRef.current.push(textTimer);
+        const followUpTimer = setTimeout(() => {
+          if (activeFollowUp === null) {
+            setShowFollowUps(true);
+            const listeningTimer = setTimeout(() => {
+              setStatusText(<span>Listening<span className="dots">...</span></span>);
+            }, 10000);
+            timersRef.current.push(listeningTimer);
+          }
+        }, 5000);
+        timersRef.current.push(followUpTimer);
+      }, 8000);
+      timersRef.current.push(chartTimer);
 
       return () => {
         timersRef.current.forEach(clearTimeout);
@@ -1443,7 +1441,7 @@ function App() {
           )}
           <div className={`current-question ${showQuestion ? 'visible' : ''}`}>{displayedQuestion}</div>
         </div>
-        <div className="status-text">{statusText}</div>
+        <div className={`status-text ${statusText ? 'visible' : ''}`}>{statusText}</div>
         {showChart && <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>}
