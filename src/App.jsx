@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
@@ -731,6 +731,7 @@ function App() {
   const [showQuestion, setShowQuestion] = useState(true);
   const [showChart, setShowChart] = useState(true);
   const [showFollowUps, setShowFollowUps] = useState(true);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
   const conversionRate = (conversionFunnelData.datasets[0].data[3] / conversionFunnelData.datasets[0].data[0]) * 100;
 
   const followUpQuestions = [
@@ -1340,6 +1341,25 @@ function App() {
     },
   ];
 
+  useEffect(() => {
+    if (currentQuestion) {
+      const timer1 = setTimeout(() => {
+        setShowChart(true);
+      }, 2000);
+
+      const timer2 = setTimeout(() => {
+        if (activeFollowUp === null) {
+          setShowFollowUps(true);
+        }
+      }, 7000);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }
+  }, [currentQuestion, activeFollowUp]);
+
   return (
     <div className="dashboard-container">
       <div className="nav-icon" onClick={() => setIsNavOpen(!isNavOpen)}>
@@ -1353,18 +1373,11 @@ function App() {
             onClick={() => {
               setActiveTab(index);
               setActiveFollowUp(null);
+              setCurrentQuestion(tabs[index].question);
               setIsNavOpen(false);
               setShowQuestion(true);
               setShowChart(false);
               setShowFollowUps(false);
-
-              setTimeout(() => {
-                setShowChart(true);
-              }, 2000);
-
-              setTimeout(() => {
-                setShowFollowUps(true);
-              }, 7000);
             }}
           >
             <h2>{tab.question}</h2>
@@ -1372,18 +1385,24 @@ function App() {
         ))}
       </div>
       <div className="right-panel">
-        {showQuestion && <h1 className="current-question">{tabs[activeTab].question}</h1>}
+        {showQuestion && <h1 className="current-question">{currentQuestion}</h1>}
         {showChart && <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>}
-        {showFollowUps && tabs[activeTab].followUp && (
+        {showFollowUps && tabs[activeTab].followUp && !activeFollowUp && (
           <div className="follow-up-container">
             <h3>Follow-up Questions:</h3>
             {tabs[activeTab].followUp.map((q, index) => (
               <div
                 key={index}
                 className={`question ${activeFollowUp === index && activeTab === tabs.findIndex(t => t.followUp === tabs[activeTab].followUp) ? 'active' : ''}`}
-                onClick={() => setActiveFollowUp(activeFollowUp === index && activeTab === tabs.findIndex(t => t.followUp === tabs[activeTab].followUp) ? null : index)}
+                onClick={() => {
+                  setActiveFollowUp(index);
+                  setCurrentQuestion(q.question);
+                  setShowQuestion(true);
+                  setShowChart(false);
+                  setShowFollowUps(false);
+                }}
               >
                 <h4>{q.question}</h4>
               </div>
