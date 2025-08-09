@@ -109,12 +109,17 @@ h2{
 }
 
 .follow-up-container h4 {
-  font-weight: normal;
   margin: 0;
+  font-weight: normal;
+}
+
+.back-arrow {
+  font-size: 1.2em;
+  cursor: pointer;
+  transform: translateY(-2px);
 }
 
 .current-question {
   font-size: 1.2em;
-  margin-top: -20px;
   margin-bottom: 20px;
 }

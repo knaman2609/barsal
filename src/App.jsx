@@ -1385,7 +1385,16 @@ function App() {
         ))}
       </div>
       <div className="right-panel">
-        {showQuestion && <h1 className="current-question">{currentQuestion}</h1>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {activeFollowUp !== null && (
+            <div className="back-arrow" onClick={() => {
+              setActiveFollowUp(null);
+              setCurrentQuestion(tabs[activeTab].question);
+              setShowFollowUps(true);
+            }}>&#x2190;</div>
+          )}
+          {showQuestion && <div className="current-question">{currentQuestion}</div>}
+        </div>
         {showChart && <div className="chart-container">
           {activeFollowUp !== null && tabs[activeTab].followUp ? tabs[activeTab].followUp[activeFollowUp].answer : tabs[activeTab].chart}
         </div>}
